@@ -22,11 +22,13 @@
 
 /* Second implementation */
 // function fibonacciGenerator() {
-//   const cache = {};
+//   const cache = new Map();
 
 //   return function* (number) {
-//     if (number.toString() in cache) {
-//       yield* cache[number.toString()];
+//     let key = number.toString();
+//     if (cache.has(key)) {
+//       console.log('Retrieved from cache: ');
+//       yield* cache.get(key);
 //       return;
 //     }
 
@@ -51,7 +53,7 @@
 //       }
 //     }
 
-//     cache[number.toString()] = result;
+//     cache.set(key, result);
 //   };
 // }
 
@@ -64,7 +66,7 @@
 
 /* Third implementation */
 function fibonacciGenerator() {
-  const cache = {};
+  const cache = new Map();
 
   return function* (start, end) {
     let num1 = 0;
@@ -72,8 +74,9 @@ function fibonacciGenerator() {
     let currentIndex = 0;
 
     const rangeKey = `${start},${end}`;
-    if (rangeKey in cache) {
-      yield* cache[rangeKey];
+    if (cache.has(rangeKey)) {
+      console.log('Retrieved from cache: ');
+      yield* cache.get(rangeKey);
       return;
     }
 
@@ -97,11 +100,13 @@ function fibonacciGenerator() {
       }
       currentIndex++;
     }
-    cache[rangeKey] = result;
+    cache.set(rangeKey, result);
   };
 }
 
 const fibonacci = fibonacciGenerator();
 
-const result = fibonacci(4, 5);
+const result = fibonacci(0, 5);
+const result2 = fibonacci(0, 5);
 console.log([...result]);
+console.log([...result2]);
