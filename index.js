@@ -1,17 +1,15 @@
 /* First implementation */
 // function fibonacciGenerator() {
 //   return function* (number) {
-//     let num1 = 0;
-//     let num2 = 1;
+//     let current = 0;
+//     let next = 1;
 
-//     if (number >= 0) yield num1;
-//     if (number >= 1) yield num2;
+//     if (number >= 0) yield current;
+//     if (number >= 1) yield next;
 
 //     for (let i = 2; i <= number; i++) {
-//       let nextNum = num1 + num2;
-//       yield nextNum;
-//       num1 = num2;
-//       num2 = nextNum;
+//       [current, next] = [next, next + current];
+//       yield next;
 //     }
 //   };
 // }
@@ -34,22 +32,20 @@
 
 //     const result = [];
 
-//     let num1 = 0;
-//     let num2 = 1;
+//     let current = 0;
+//     let next = 1;
 
-//     for (let i = 0; i < number; i++) {
+//     for (let i = 0; i <= number; i++) {
 //       if (i === 0) {
-//         result.push(num1);
-//         yield num1;
+//         result.push(current);
+//         yield current;
 //       } else if (i === 1) {
-//         result.push(num2);
-//         yield num2;
+//         result.push(next);
+//         yield next;
 //       } else {
-//         let nextNum = num1 + num2;
-//         result.push(nextNum);
-//         yield nextNum;
-//         num1 = num2;
-//         num2 = nextNum;
+//         [current, next] = [next, next + current];
+//         result.push(next);
+//         yield next;
 //       }
 //     }
 
@@ -65,15 +61,33 @@
 // console.log([...cachedResult]);
 
 /* Third implementation */
+/** 
+The returned function has below parameters
+@params start - Optional start index
+@params end - The nth sequence from 0
+*/
 function fibonacciGenerator() {
   const cache = new Map();
 
-  return function* (start, end) {
-    let num1 = 0;
-    let num2 = 1;
+  return function* (...args) {
+    let start;
+    let end;
+
+    if (args.length === 1) {
+      start = 0;
+      end = args[0];
+    } else {
+      start = args[0];
+      end = args[1];
+    }
+
+    if (start > end) throw new Error('first arg must be smaller than second');
+
+    let current = 0;
+    let next = 1;
     let currentIndex = 0;
 
-    const rangeKey = `${start},${end}`;
+    const rangeKey = args.join(':');
     if (cache.has(rangeKey)) {
       console.log('Retrieved from cache: ');
       yield* cache.get(rangeKey);
@@ -83,20 +97,17 @@ function fibonacciGenerator() {
     const result = [];
 
     while (currentIndex <= end) {
-      let nextNum;
       if (currentIndex === 0) {
-        nextNum = num1;
+        next = 0;
       } else if (currentIndex === 1) {
-        nextNum = num2;
+        next = 1;
       } else {
-        nextNum = num1 + num2;
-        num1 = num2;
-        num2 = nextNum;
+        [current, next] = [next, next + current];
       }
 
       if (currentIndex >= start) {
-        result.push(nextNum);
-        yield nextNum;
+        result.push(next);
+        yield next;
       }
       currentIndex++;
     }
@@ -106,7 +117,7 @@ function fibonacciGenerator() {
 
 const fibonacci = fibonacciGenerator();
 
-const result = fibonacci(0, 5);
-const result2 = fibonacci(0, 5);
+const result = fibonacci(5, 10);
+const result2 = fibonacci(5, 10);
 console.log([...result]);
 console.log([...result2]);
